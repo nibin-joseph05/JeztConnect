@@ -20,10 +20,20 @@ class JeztConnectApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/splash',
-      routes: {
-        '/splash': (context) => const SplashScreen(),
-        '/login': (context) => const LoginPage(),
-        '/dashboard': (context) => const DashboardPage(),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/dashboard') {
+          final accessToken = settings.arguments as String?;
+          return MaterialPageRoute(
+            builder: (context) => DashboardPage(
+              accessToken: accessToken ?? '',
+            ),
+          );
+        }
+        return MaterialPageRoute(
+          builder: (context) => settings.name == '/login'
+              ? const LoginPage()
+              : const SplashScreen(),
+        );
       },
     );
   }
