@@ -23,9 +23,10 @@ flutter:
   assets:
     - assets/logo/logo.png
     - assets/logo/logo-round.png
+    - assets/logo/logo-icon.png
 
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/logo/logo.png"
+  image_path: "assets/logo/logo-icon.png"
