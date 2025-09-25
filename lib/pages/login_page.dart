@@ -47,6 +47,21 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_companyIdController.text.trim() != '1048') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid Company ID'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      _companyIdController.clear();
+      _passwordController.clear();
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final accessToken = await ApiService.login(
@@ -54,19 +69,44 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         _passwordController.text.trim(),
       );
       if (mounted) {
-        Navigator.pushReplacementNamed(
-          context,
-          '/dashboard',
-          arguments: accessToken,
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login successful, loading dashboard...'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
         );
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          Navigator.pushReplacementNamed(
+            context,
+            '/dashboard',
+            arguments: accessToken,
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
+        String errorMessage;
+        if (e.toString().contains('404')) {
+          errorMessage = 'No account found for the provided Company ID.';
+          _passwordController.clear();
+        } else if (e.toString().contains('401')) {
+          errorMessage = 'Incorrect password. Please try again.';
+          _passwordController.clear();
+        } else if (e.toString().contains('Network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else {
+          errorMessage = 'An unexpected error occurred. Please try again later.';
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: $e'),
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
           ),
         );
       }
