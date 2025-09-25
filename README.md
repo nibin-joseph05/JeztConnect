@@ -1,16 +1,39 @@
-# jezt_connect
+# JeztConnect
 
-A new Flutter project.
+A Flutter application for Jezt Technologies demonstrating login, dashboard data fetching, and logout functionality. Includes token-based authentication, polished UI, and error handling.
+
+## Features
+
+- Animated splash screen
+- Login with Company ID and password (with validation)
+- Dashboard displaying live API data in scrollable cards
+- Pull-to-refresh and retry on network errors
+- Logout with confirmation
+- Graceful error handling
+
+## Test Credentials
+
+Company ID: 1048
+Password: Jeztai@1234
+
+## API Endpoints
+
+- Login: https://cloud.jezt.tech/api/jezt/token/
+- Dashboard: https://cloud.jezt.tech/api/viewfromjson/
+- Logout: https://cloud.jezt.tech/api/logout/
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+git clone https://github.com/nibin-joseph05/JeztConnect.git
+Navigate into the folder and install dependencies:
 
-A few resources to get you started if this is your first Flutter project:
+cd JeztConnect
+flutter pub get
+Run the app on a connected device or emulator:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+flutter run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Author
+Nibin Joseph
+Email: nibin.joseph.career@gmail.com
+Phone: +91 9778234876
