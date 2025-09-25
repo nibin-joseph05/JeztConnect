@@ -19,6 +19,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   late Animation<Offset> _slideAnimation;
   bool _isLoading = false;
   bool _obscurePassword = true;
+  String? _companyIdError;
+  String? _passwordError;
 
   @override
   void initState() {
@@ -46,7 +48,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _companyIdError = _companyIdController.text.isEmpty ? 'Please enter company ID' : null;
+      _passwordError = _passwordController.text.isEmpty
+          ? 'Please enter password'
+          : _passwordController.text.length < 6
+          ? 'Password must be at least 6 characters'
+          : null;
+    });
+
+    if (_companyIdError != null || _passwordError != null) return;
 
     if (_companyIdController.text.trim() != '1048') {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,6 +70,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       );
       _companyIdController.clear();
       _passwordController.clear();
+      setState(() {
+        _companyIdError = null;
+        _passwordError = null;
+      });
       return;
     }
 
@@ -224,6 +239,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                         labelText: 'Company ID',
                                         labelStyle: const TextStyle(color: Colors.white70),
                                         prefixIcon: const Icon(Icons.business_rounded, color: Colors.white70),
+                                        errorText: _companyIdError,
+                                        errorStyle: const TextStyle(color: Colors.redAccent),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12.0),
                                           borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
@@ -240,11 +257,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                         fillColor: Colors.white.withOpacity(0.05),
                                       ),
                                       keyboardType: TextInputType.number,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter company ID';
-                                        }
-                                        return null;
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _companyIdError = value.isEmpty ? 'Please enter company ID' : null;
+                                        });
                                       },
                                     ),
                                     const SizedBox(height: 20.0),
@@ -265,6 +281,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                             setState(() => _obscurePassword = !_obscurePassword);
                                           },
                                         ),
+                                        errorText: _passwordError,
+                                        errorStyle: const TextStyle(color: Colors.redAccent),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12.0),
                                           borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
@@ -280,14 +298,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                         filled: true,
                                         fillColor: Colors.white.withOpacity(0.05),
                                       ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter password';
-                                        }
-                                        if (value.length < 6) {
-                                          return 'Password must be at least 6 characters';
-                                        }
-                                        return null;
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _passwordError = value.isEmpty
+                                              ? 'Please enter password'
+                                              : value.length < 6
+                                              ? 'Password must be at least 6 characters'
+                                              : null;
+                                        });
                                       },
                                     ),
                                     const SizedBox(height: 30.0),
@@ -295,7 +313,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                       width: double.infinity,
                                       height: 55.0,
                                       child: ElevatedButton(
-                                        onPressed: _isLoading ? null : _login,
+                                        onPressed: _isLoading ||
+                                            _companyIdController.text.isEmpty ||
+                                            _passwordController.text.isEmpty
+                                            ? null
+                                            : _login,
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.white,
                                           foregroundColor: const Color(0xFF2E86AB),

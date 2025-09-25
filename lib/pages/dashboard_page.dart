@@ -237,49 +237,54 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (item is Map)
-                ...item.entries.map((entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          '${entry.key}:',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.0,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: 600.0,
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                if (item is Map)
+                  ...item.entries.map((entry) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            '${entry.key}:',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.0,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          entry.value?.toString() ?? 'N/A',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.0,
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            entry.value?.toString() ?? 'N/A',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  ))
+                else
+                  Text(
+                    item?.toString() ?? 'No data',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ))
-              else
-                Text(
-                  item?.toString() ?? 'No data',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -312,6 +317,22 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
               showBackButton: false,
               actions: [
                 IconButton(
+                  onPressed: _loadDashboardData,
+                  icon: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: const Icon(
+                      Icons.refresh_rounded,
+                      color: Colors.white,
+                      size: 20.0,
+                    ),
+                  ),
+                  tooltip: 'Refresh Data',
+                ),
+                IconButton(
                   onPressed: _logout,
                   icon: Container(
                     padding: const EdgeInsets.all(8.0),
@@ -325,6 +346,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                       size: 20.0,
                     ),
                   ),
+                  tooltip: 'Logout',
                 ),
               ],
             ),
@@ -356,7 +378,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
               )
                   : _hasError
                   ? Center(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -410,14 +432,13 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                   ),
                 ),
               )
-                  : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
-                      child: Text(
+                  : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         'Dashboard Data (${_dashboardData.length} items)',
                         style: const TextStyle(
                           color: Colors.white,
@@ -425,14 +446,15 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
+                      const SizedBox(height: 16.0),
+                      ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
                         itemCount: _dashboardData.length,
                         itemBuilder: (context, index) => _buildDataCard(index, _dashboardData[index]),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
